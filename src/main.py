@@ -26,6 +26,7 @@ def main():
     create_genesis(utxo)
     mempool = Mempool()
     validator = Validator(utxo)
+    blockchain = []
 
     while True:
         print("\n=== Bitcoin Transaction Simulator ===")
@@ -69,7 +70,7 @@ def main():
 
         elif choice == "4":
             miner = input("Miner name: ")
-            block = mine_block(miner, mempool, utxo)
+            block = mine_block(miner, mempool, utxo,blockchain)
             print("Block mined. Fees:", block.total_fees)
 
         elif choice == "5":

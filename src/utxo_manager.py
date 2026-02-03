@@ -18,7 +18,7 @@ class UTXOManager:
             amount
             for (amount, utxo_owner) in self.utxo_set.values()
             if utxo_owner == owner
-    )
+        )
 
     def exists(self, tx_id: str, index: int) -> bool:
         return (tx_id, index) in self.utxo_set
