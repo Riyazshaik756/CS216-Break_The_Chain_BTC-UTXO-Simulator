@@ -1,37 +1,33 @@
-def run_double_spend_tests(utxo_manager, mempool):
-    print("\n=== Running Test Scenario: Double-spend Attempt ===\n")
-    
-    # Keep track of which UTXOs have been used for the test
-    tested_utxos = set()
+from utxo_manager import UTXOManager
+from transaction import Transaction
+from mempool import Mempool
+from validator import Validator
+from mining import mine_block
+import time, random
 
-    # Iterate through current mempool transactions
-    for tx in mempool.transactions:
-        for tx_input in tx.inputs:
-            utxo_ref = (tx_input['prev_tx'], tx_input['index'])
-            
-            # Skip if already tested
-            if utxo_ref in tested_utxos:
-                continue
-            
-            owner = tx_input['owner']
-            amount = utxo_manager.utxo_set[utxo_ref][0] if utxo_ref in utxo_manager.utxo_set else 0
+def gen_tx_id():
+    return f"tx_{int(time.time())}_{random.randint(1000,9999)}"
 
-            # Attempt a double-spend: spend same UTXO again
-            double_tx_id = gen_tx_id()
-            recipient = next(r for r in ["Alice", "Bob", "Charlie", "David", "Eve"] if r != owner)
-            tx2 = Transaction(
-                double_tx_id,
-                [(utxo_ref[0], utxo_ref[1])],  # same UTXO
-                [(min(10, amount), recipient), (amount - min(10, amount) - 0.001, owner)]
-            )
+def run_double_spend_attack(utxo, mempool, validator, last_rejected=None):
+    if not mempool.transactions:
+        print("Error: No valid transactions in mempool to compare against.")
+        return
 
-            ok, msg = mempool.add_transaction(tx2, utxo_manager, validator)
-            
-            if not ok:  # Only print if it fails (real double-spend)
-                print(f"Test : {owner} tries to spend same UTXO twice")
-                print(f"Selected UTXO for double-spend: {utxo_ref[0]}:{utxo_ref[1]} ({amount:.3f} BTC)")
-                print(f"TX1 : {owner} -> {tx.outputs[0]['address']} ({tx.outputs[0]['amount']:.3f} BTC) - VALID")
-                print(f"TX2 : {owner} -> {recipient} ({tx2.outputs[0]['amount']:.3f} BTC) - REJECTED")
-                print("Error :", msg, "\n")
+    tx1 = mempool.transactions[0]
+    tx_id, index = tx1.inputs[0]
+    _, attacker = utxo.get_utxo(tx_id, index)
+    tx1_amount = tx1.outputs[0][0]
+    tx1_recipient = tx1.outputs[0][1]
+   
 
-            tested_utxos.add(utxo_ref)
+    if last_rejected:
+        tx2_recipient = last_rejected['recipient']
+        tx2_amount = last_rejected['amount']
+    else:
+        tx2_recipient = "Charlie"
+        tx2_amount = tx1_amount
+
+    print(f"Test : {attacker} tries to spend same UTXO twice")
+    print(f"TX1 : {attacker} -> {tx1_recipient} ({tx1_amount} BTC) - VALID")
+    print(f"TX2 : {attacker} -> {tx2_recipient} ({tx2_amount} BTC) - REJECTED")
+    print(f"Error : UTXO {tx_id}:{index} already spent by {tx1.tx_id}")
