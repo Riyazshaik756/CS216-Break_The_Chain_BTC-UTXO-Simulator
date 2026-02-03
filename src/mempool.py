@@ -20,9 +20,11 @@ class Mempool:
         return True, "Transaction added to mempool"
 
     def remove_transaction(self, tx):
-        self.transactions.remove(tx)
-        for tx_id, index in tx.inputs:
-            self.spent_utxos.discard((tx_id, index))
+        if tx in self.transactions:
+            self.transactions.remove(tx)
+            for tx_id, index in tx.inputs:
+                self.spent_utxos.discard((tx_id, index))
+
 
     def get_top_transactions(self, n, utxo_manager):
         return sorted(
