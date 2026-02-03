@@ -1,8 +1,5 @@
 import sys, os, time, random
 
-from matplotlib.pylab import block
-sys.path.append(os.path.dirname(__file__))
-
 from utxo_manager import UTXOManager
 from transaction import Transaction
 from mempool import Mempool
