@@ -1,4 +1,3 @@
-
 class Transaction:
     def __init__(self, tx_id: str, inputs: list, outputs: list):
         self.tx_id = tx_id
@@ -8,7 +7,7 @@ class Transaction:
     def input_sum(self, utxo_manager):
         total = 0.0
         for tx_id, index in self.inputs:
-            amount, _ = utxo_manager.utxo_set[(tx_id, index)]
+            amount, _ = utxo_manager.get_utxo(tx_id, index)
             total += amount
         return total
 
