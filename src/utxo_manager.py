@@ -27,3 +27,10 @@ class UTXOManager:
         if (tx_id, index) not in self.utxo_set:
             raise ValueError(f"UTXO not found: tx_id={tx_id}, index={index}")
         return self.utxo_set[(tx_id, index)]
+    
+    def get_utxos_for_owner(self, owner: str):
+        return [
+            (tx_id, index, amount)
+            for (tx_id, index), (amount, utxo_owner) in self.utxo_set.items()
+            if utxo_owner == owner
+        ]
