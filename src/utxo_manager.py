@@ -9,7 +9,9 @@ class UTXOManager:
         self.utxo_set[key] = value
 
     def remove_utxo(self, tx_id: str, index: int):
-        self.utxo_set.pop((tx_id, index), None)
+            if (tx_id, index) not in self.utxo_set:
+                raise ValueError(f"UTXO not found: tx_id={tx_id}, index={index}")
+            del self.utxo_set[(tx_id, index)]
 
     def get_balance(self, owner: str) -> float:
         total = 0.0
