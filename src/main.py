@@ -65,8 +65,9 @@ def main():
             show_utxos(utxo)
 
         elif choice == "3":
-            for tx in mempool.transactions:
-                print(tx.tx_id)
+           for tx in mempool.transactions:
+            print(f"{tx.tx_id}: inputs={tx.inputs}, outputs={tx.outputs}, fee={tx.fee(utxo):.4f}")
+
 
         elif choice == "4":
             miner = input("Miner name: ")

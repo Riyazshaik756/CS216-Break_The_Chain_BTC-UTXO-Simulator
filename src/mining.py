@@ -1,6 +1,8 @@
 from block import Block
+from mempool import Mempool
+from utxo_manager import UTXOManager
 
-def mine_block(miner: str, mempool: 'Mempool', utxo_manager: 'UTXOManager', blockchain: list, num_txs=5):
+def mine_block(miner: str, mempool: Mempool, utxo_manager: UTXOManager, blockchain: list, num_txs=5):
     """
     Simulate mining a block.
     1. Select top transactions from mempool
